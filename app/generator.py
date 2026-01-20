@@ -8,7 +8,7 @@ from dataclasses import dataclass
 import re
 import google.generativeai as genai
 
-from app.config import GOOGLE_API_KEY, GEMINI_MODEL, SYSTEM_PROMPT
+import app.config as config
 from app.retriever import RetrievalResult
 from app.utils import get_fallback_chain, init_gemini_model
 
@@ -37,12 +37,12 @@ class GeminiGenerator:
     def __init__(
         self,
         api_key: Optional[str] = None,
-        model: str = GEMINI_MODEL
+        model: str = config.GEMINI_MODEL
     ):
         """
         Initialize Gemini generator with fallback support.
         """
-        self.api_key = api_key or GOOGLE_API_KEY
+        self.api_key = api_key or config.GOOGLE_API_KEY
         self.primary_model_name = model
         self.fallback_chain = get_fallback_chain(self.primary_model_name)
         
@@ -58,7 +58,7 @@ class GeminiGenerator:
         self.model_name = self.fallback_chain[self.current_model_idx]
         self.model, self.supports_system_instruction = init_gemini_model(
             self.model_name, 
-            SYSTEM_PROMPT
+            config.SYSTEM_PROMPT
         )
 
     def generate(
@@ -124,7 +124,7 @@ class GeminiGenerator:
         
         # Inject system instructions into prompt if model doesn't support the parameter
         if not getattr(self, 'supports_system_instruction', False):
-            prompt_parts.append(f"INSTRUCTIONS:\n{SYSTEM_PROMPT}\n")
+            prompt_parts.append(f"INSTRUCTIONS:\n{config.SYSTEM_PROMPT}\n")
             prompt_parts.append("-" * 30 + "\n")
         
         # Add conversation history if present

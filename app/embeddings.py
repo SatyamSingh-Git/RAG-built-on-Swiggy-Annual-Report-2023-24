@@ -7,7 +7,7 @@ from typing import List, Optional
 import numpy as np
 import google.generativeai as genai
 
-from app.config import GOOGLE_API_KEY, EMBEDDING_MODEL
+import app.config as config
 
 
 class GeminiEmbeddings:
@@ -17,7 +17,7 @@ class GeminiEmbeddings:
     Uses gemini-embedding-001 model which is free tier eligible.
     """
     
-    def __init__(self, api_key: Optional[str] = None, model: str = EMBEDDING_MODEL):
+    def __init__(self, api_key: Optional[str] = None, model: str = None):
         """
         Initialize Gemini embeddings.
         
@@ -25,8 +25,8 @@ class GeminiEmbeddings:
             api_key: Google API key (uses env var if not provided)
             model: Embedding model name
         """
-        self.api_key = api_key or GOOGLE_API_KEY
-        self.model = model
+        self.api_key = api_key or config.GOOGLE_API_KEY
+        self.model = model or config.EMBEDDING_MODEL
         
         if not self.api_key:
             raise ValueError("GOOGLE_API_KEY is required. Set it in .env file.")

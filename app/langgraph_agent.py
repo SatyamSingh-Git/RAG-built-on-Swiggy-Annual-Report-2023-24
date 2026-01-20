@@ -8,10 +8,7 @@ from dataclasses import dataclass
 import google.generativeai as genai
 from langgraph.graph import StateGraph, END
 
-from app.config import (
-    GOOGLE_API_KEY, GEMINI_MODEL,
-    QUERY_CLASSIFIER_PROMPT, PROXY_ANSWER_PROMPT
-)
+import app.config as config
 from app.embeddings import GeminiEmbeddings
 from app.vector_store import FAISSVectorStore
 from app.retriever import HybridRetriever, RetrievalResult
@@ -67,8 +64,8 @@ class RAGAgent:
         self.generator = GeminiGenerator()
         
         # Configure Gemini for classification/proxy
-        genai.configure(api_key=GOOGLE_API_KEY)
-        self.llm = genai.GenerativeModel(GEMINI_MODEL)
+        genai.configure(api_key=config.GOOGLE_API_KEY)
+        self.llm = genai.GenerativeModel(config.GEMINI_MODEL)
         
         # Build the graph
         self.graph = self._build_graph()
@@ -117,7 +114,7 @@ class RAGAgent:
         """Classify query as clear or unclear."""
         query = state["original_query"]
         
-        prompt = QUERY_CLASSIFIER_PROMPT.format(query=query)
+        prompt = config.QUERY_CLASSIFIER_PROMPT.format(query=query)
         response = self.llm.generate_content(prompt)
         
         classification = response.text.strip().upper()
@@ -133,7 +130,7 @@ class RAGAgent:
         """Generate a proxy answer for unclear queries."""
         query = state["original_query"]
         
-        prompt = PROXY_ANSWER_PROMPT.format(query=query)
+        prompt = config.PROXY_ANSWER_PROMPT.format(query=query)
         response = self.llm.generate_content(prompt)
         
         proxy_answer = response.text.strip()
