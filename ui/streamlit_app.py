@@ -513,14 +513,42 @@ def main():
     # Render header
     render_header()
     
-    # Check configuration
-    errors = validate_config()
-    if errors:
+    # Config validation
+    config_errors = validate_config()
+    if config_errors:
         st.error("⚠️ Configuration Error")
-        for error in errors:
-            st.warning(error)
+        for error in config_errors:
+            st.error(error)
+            
+        # --- DEBUG SECTION ---
+        with st.expander("🕵️ Debug Information (Click me if you are stuck)", expanded=True):
+            st.warning("Debugging Secrets & Keys")
+            
+            # Check Streamlit Secrets
+            try:
+                secrets_keys = list(st.secrets.keys())
+                st.write(f"**Available Secret Keys:** `{secrets_keys}`")
+                
+                if "gemini" in st.secrets:
+                    st.write(f"**Found [gemini] section keys:** `{list(st.secrets['gemini'].keys())}`")
+                    
+            except Exception as e:
+                st.write(f"❌ Error reading secrets: {e}")
+            
+            # Check Env Vars (safely)
+            import os
+            has_env_key = "GOOGLE_API_KEY" in os.environ
+            st.write(f"**Has GOOGLE_API_KEY in os.environ:** `{has_env_key}`")
+            
+            from app import config
+            st.write(f"**App Config sees Key:** `{bool(config.GOOGLE_API_KEY)}`")
+            if config.GOOGLE_API_KEY:
+                st.write(f"**Key Length:** `{len(config.GOOGLE_API_KEY)}`")
+            else:
+                st.write("**Key is Empty/None**")
+                
         st.info("Please check your `.env` file and ensure the PDF is in the correct location.")
-        return
+        st.stop()
     
     # Initialize if needed
     if not st.session_state.initialized:
