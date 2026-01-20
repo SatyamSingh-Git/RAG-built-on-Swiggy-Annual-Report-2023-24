@@ -23,14 +23,27 @@ EXPORTS_DIR.mkdir(parents=True, exist_ok=True)
 # API Configuration
 try:
     import streamlit as st
+    # Debug secrets
+    print(f"DEBUG: Available secrets keys: {list(st.secrets.keys()) if 'secrets' in dir(st) else 'No secrets attribute'}")
+    
     # Try getting from streamlit secrets first (for cloud deployment)
     if "GOOGLE_API_KEY" in st.secrets:
+        print("DEBUG: Found GOOGLE_API_KEY in st.secrets")
         GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
     else:
+        print("DEBUG: GOOGLE_API_KEY NOT in st.secrets, checking os.getenv")
         GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
 except ImportError:
+    print("DEBUG: streamlit import failed, falling back to os.getenv")
     # Fallback for CLI/testing where streamlit might not be running
     GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
+
+# Strip whitespace just in case
+if GOOGLE_API_KEY:
+    GOOGLE_API_KEY = GOOGLE_API_KEY.strip()
+    print(f"DEBUG: Final API Key length: {len(GOOGLE_API_KEY)}")
+else:
+    print("DEBUG: Final API Key is EMPTY")
 
 # Model Configuration
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
