@@ -21,7 +21,16 @@ VECTORSTORE_DIR.mkdir(parents=True, exist_ok=True)
 EXPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
 # API Configuration
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
+try:
+    import streamlit as st
+    # Try getting from streamlit secrets first (for cloud deployment)
+    if "GOOGLE_API_KEY" in st.secrets:
+        GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
+    else:
+        GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
+except ImportError:
+    # Fallback for CLI/testing where streamlit might not be running
+    GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
 
 # Model Configuration
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
