@@ -91,6 +91,20 @@ PDF_PATH = BASE_DIR / os.getenv("PDF_PATH", "Annual-Report-FY-2023-24.pdf")
 # Validate configuration
 def validate_config():
     """Validate that required configuration is present."""
+    global GOOGLE_API_KEY
+    
+    # Lazy load: Re-try fetching key if it's missing (fixes Streamlit import timing issues)
+    if not GOOGLE_API_KEY:
+        try:
+            import streamlit as st
+            found_key = get_secret_key()
+            if found_key:
+                 GOOGLE_API_KEY = found_key
+                 # Also update os.environ for libraries that might check it independently
+                 os.environ["GOOGLE_API_KEY"] = found_key
+        except:
+            pass
+            
     errors = []
     
     if not GOOGLE_API_KEY:
