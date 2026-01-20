@@ -173,6 +173,26 @@ e:/RAG/
 - Python 3.10+
 - A Google Cloud API Key (for Gemini)
 
+## ☁️ Deployment
+
+Since this is a dynamic Python application, it cannot be hosted on static sites like Netlify. We recommend:
+
+### Option 1: Streamlit Cloud (Easiest)
+1.  Push this code to GitHub.
+2.  Log in to [Streamlit Cloud](https://streamlit.io/cloud).
+3.  Click "New App" and select this repository.
+4.  **Crucial**: Go to "Advanced Settings" -> "Secrets" and add your API key:
+    ```toml
+    GOOGLE_API_KEY = "your-key-here"
+    ```
+
+### Option 2: Hugging Face Spaces (Docker)
+This repository includes a `Dockerfile` for container deployment.
+1.  Create a new [Space on Hugging Face](https://huggingface.co/new-space).
+2.  Select **Docker** as the SDK.
+3.  Connect this GitHub repository.
+4.  In the Space "Settings", add `GOOGLE_API_KEY` as a **Repository Secret**.
+
 ### Installation
 
 1.  **Clone the repository**
