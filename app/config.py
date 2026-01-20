@@ -23,19 +23,47 @@ EXPORTS_DIR.mkdir(parents=True, exist_ok=True)
 # API Configuration
 try:
     import streamlit as st
-    # Debug secrets
-    print(f"DEBUG: Available secrets keys: {list(st.secrets.keys()) if 'secrets' in dir(st) else 'No secrets attribute'}")
     
-    # Try getting from streamlit secrets first (for cloud deployment)
-    if "GOOGLE_API_KEY" in st.secrets:
+    # helper to find key
+    def get_secret_key():
+        # 1. Top level
+        if "GOOGLE_API_KEY" in st.secrets:
+            return st.secrets["GOOGLE_API_KEY"]
+        
+        # 2. Nested under [gemini]
+        if "gemini" in st.secrets:
+            if "api_key" in st.secrets["gemini"]:
+                return st.secrets["gemini"]["api_key"]
+            if "GOOGLE_API_KEY" in st.secrets["gemini"]:
+                return st.secrets["gemini"]["GOOGLE_API_KEY"]
+                
+        # 3. Nested under [general] or [secrets]
+        for section in ["general", "secrets"]:
+            if section in st.secrets and "GOOGLE_API_KEY" in st.secrets[section]:
+                return st.secrets[section]["GOOGLE_API_KEY"]
+                
+        return None
+
+    # Try getting from streamlit secrets
+    secret_key = get_secret_key()
+    
+    if secret_key:
         print("DEBUG: Found GOOGLE_API_KEY in st.secrets")
-        GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
+        GOOGLE_API_KEY = secret_key
     else:
         print("DEBUG: GOOGLE_API_KEY NOT in st.secrets, checking os.getenv")
+        # Debug available keys to help user
+        try:
+            print(f"DEBUG: Available top-level keys: {list(st.secrets.keys())}")
+        except:
+             print("DEBUG: Could not list secrets keys")
         GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
+
 except ImportError:
     print("DEBUG: streamlit import failed, falling back to os.getenv")
-    # Fallback for CLI/testing where streamlit might not be running
+    GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
+except Exception as e:
+    print(f"DEBUG: Error reading secrets: {e}")
     GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
 
 # Strip whitespace just in case
