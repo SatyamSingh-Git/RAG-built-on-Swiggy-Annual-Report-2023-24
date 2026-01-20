@@ -1,0 +1,29 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Environment variables (Critical security)
+.env
+.env.example
+
+# Streamlit
+.streamlit/secrets.toml
+
+# IDE
+.vscode
+.idea
+
+# Local data (Optional: comment out if you want to ship the pre-built index)
+# data/vectorstore/
