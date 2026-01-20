@@ -1,0 +1,27 @@
+# Byte-compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment
+.env
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+
+# Data files
+data/vectorstore/
+
+# Exports
+exports/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
